@@ -10,10 +10,25 @@
 * To manage and serve
 * image-service
 
+^ Suite of services to import and manage images
+
+^ images are stored in S3, but the metadata stored in trivagoDB
+
+^ resize, duplicate check
+
+^ image-api - used by non hotel search apps, tHM
 
 ---
 
 ## AWS migration
+
+^ content moving to AWS
+
+^ last 6 months
+
+^ gain more freedom
+
+^ leverage available and managed services by AWS
 
 ![](dominik-schroder-14534-unsplash.jpg)
 
@@ -25,11 +40,25 @@
 * all the services hosted in DUS
 * images are already in S3
 
+^ meta records (1.5 B)
+
+^ image-api
+
+^ services, cron
+
+^ refactor a bit
+
 ---
 
 # The landscape now!
 
 ![inline](aws-now.jpg)
+
+^ two types of consumers
+
+^ those who read and write (tHM)
+
+^ those who read (hotel search)
 
 ---
 
@@ -37,11 +66,23 @@
 
 ![inline](aws-plan.jpg)
 
+^ break connection to trivagoDB
+
+^ All data to hotel search via streams
+
+^ Data and services in AWS
+
 ---
 
 # Long run
 
 ![inline](aws-rename.jpg)
+
+^ Cut support from trivago DB
+
+^ Data is 100% in cloud
+
+^ Most services in AWS
 
 ---
 
@@ -53,16 +94,38 @@
 * _migration of API reads and writes_
 * _migration of other processes_
 
+^ Almost nil experience
+
+^ Experience from other teams
+
+^ Design of milestones.
+
+^ Learn and implement
+
 ---
 
 # Milestone #1 : simple database replication
 ![](alternate-skate-154657-unsplash.jpg)
+
+^ No data Transformation
+
+^ Build some pipelines which can be improved later
 
 ---
 
 # Moving the data over
 
 ![inline](m1-1.jpg)
+
+^ Two major tables
+
+^ image_data
+
+^ partner_image
+
+^ Direct replication
+
+^ unknowns
 
 ---
 
@@ -80,6 +143,14 @@
 * _How do we make it reactive_ - Kafka to Kinesis
 * _How do we store the data in AWS_ - Aurora RDS
 
+^ Most tables are already streamed out
+
+^ sps toolkit (platform) used to sink
+
+^ Store, Aurora RDS vs Dynamo DB
+
+^ Example of how one milestone builds knowledge for the next
+
 ---
 
 # and ....
@@ -91,6 +162,10 @@
 # Milestone #2 : Source of Truth
 ![](jason-blackeye-509323-unsplash.jpg)
 
+^ resuse pipelines in milestone 1
+
+^ Decided on RDS
+
 ---
 
 # What were we trying to solve
@@ -99,6 +174,10 @@
 * Better classification
 * New unique identifiers
 * Single source for our data
+
+^ All the things we wanted to do with trivagoDB
+
+^ More logical classification of images
 
 ---
 
@@ -114,6 +193,8 @@
 * Sink Kafka to Kinesis streams
 * SPS toolkit (platform)
 
+^ Similar to milestone 1
+
 ---
 
 # Not really trivial!
@@ -124,6 +205,10 @@
 
 * item
 * item2partner (advertiser connection)
+
+^ To classify an image between accommodation and poi
+
+^ accommodation_images and destination_images
 
 ---
 
@@ -137,6 +222,12 @@
 
 ![inline](Visual_Content_AWS_M2-accommodation.jpg)
 
+^ Additional Data to be sinked
+
+^ Service to generate new identifiers
+
+^ table in database
+
 ---
 
 # The execution
@@ -149,6 +240,8 @@
 
 # MILESTONE #3 : Data delivery
 ![](austin-neill-308610-unsplash.jpg)
+
+^ Data is only good if someone can use it
 
 ---
 
@@ -175,6 +268,10 @@
 * _Filter data reactively_ lambda on Kinesis
 * _Create Kafka streams_ Kabin (RDS to Kafka)
 
+^ Grand example of sharing solutions within content
+
+^ Custom built tools within content
+
 ---
 
 # Kabin and Kibin
@@ -182,6 +279,10 @@
 * Binary log readers
 * _Kibin_ -> Descriptive
 * _Kabin_ -> Identity
+
+^ Ki for Kinesis
+
+^ Ka for Kafka
 
 ---
 
@@ -197,6 +298,8 @@
 
 ![inline](Visual-AWS-M3.jpg)
 
+^ Single Kibin instance for all Tables.
+
 ---
 
 # Running Kabin
@@ -209,6 +312,8 @@
 # Full picture
 
 ![inline](Visual-AWS-M3- full.jpg)
+
+^ Single Kabin instance for all Tables.
 
 ---
 
@@ -224,12 +329,16 @@
 * Kinesis Iterator Age
 * EC2 errors
 
+^ Kinesis Iterator Age!
+
 ---
 
 # Notification Channels
 
 * e-mail
 * Slack
+
+^ email was not very efficient
 
 ---
 
@@ -246,6 +355,12 @@
 * Looker
 * Queries on Source of Truth
 * Runs on Amazon ECS
+
+^ Queries on Dynamo DB
+
+^ ECS picks it up and stores results
+
+^ Looker in progress
 
 ---
 
