@@ -300,6 +300,8 @@
 
 ^ Single Kibin instance for all Tables.
 
+^ Sieve lambdas
+
 ---
 
 # Running Kabin
